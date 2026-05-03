@@ -78,7 +78,8 @@ class a1Helper:
                                   pionP4 = pions,
                                   tauch  = self.LFtauLV.charge,
                                   leg    = 'a1')
-        hunit = h.unit
+        #hunit = h.unit
+        hunit = h / h.absolute()
         omegabar = nMinusTauAlongZLabFrame.dot(hunit)
 
         return omegabar
@@ -86,7 +87,7 @@ class a1Helper:
     
     def nTZLFr(self):
         vec = self._tauAlongZLabFrame.pvec
-        mag = vec.mag
+        mag = vec.absolute()
         #return self._tauAlongZLabFrame.pvec.unit
         return vec/mag
     

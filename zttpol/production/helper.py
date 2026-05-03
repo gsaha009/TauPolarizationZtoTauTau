@@ -13,21 +13,29 @@ logger = law.logger.get_logger(__name__)
 
 
 
-def remove_empty_places(array):
+def remove_empty_places(array, debug=False):
     counts = ak.num(array)
     max_count = int(np.max(counts))
+    if debug == True:
+        logger.info(f"DEBUG -- Max count : {max_count}")
+        logger.info(f"DEBUG -- {ak.sum(counts == max_count, axis=0)} valid entries out of {ak.num(counts, axis=0)}")
     flat = ak.flatten(array)
     out = ak.unflatten(flat, max_count)
     return out, counts
 
 
-def back_to_original(array, counts):
+def back_to_original(array, counts, debug=False):
     array = ak.flatten(array)
     out = ak.unflatten(array, counts)
+    if debug == True:
+        counts = ak.num(out)
+        yes = ak.sum(counts > 0, axis=0)
+        total = ak.num(counts, axis=0)
+        logger.info(f"DEBUG -- {yes} valid entries among {total}")
     return out
 
 
-def clean_rearranged_dict(p4dict, keylist=[]):
+def clean_rearranged_dict(p4dict, keylist=[], debug=False):
 
     if len(keylist) == 0:
         raise RuntimeWarning("must provide some key")
@@ -36,7 +44,7 @@ def clean_rearranged_dict(p4dict, keylist=[]):
     out = {key:None for key in p4dict}
     for key in keylist:
         val = p4dict[key]
-        val, count = remove_empty_places(val)
+        val, count = remove_empty_places(val, debug=debug)
         out[key] = ak.from_regular(val)
 
     if count is None:
@@ -47,7 +55,14 @@ def clean_rearranged_dict(p4dict, keylist=[]):
     
     for okey in out:
         if okey not in keylist:
-            out[okey] = p4dict[okey][mask]
+            masked_val = p4dict[okey][mask]
+            max_count_safe = ak.max(ak.num(masked_val, axis=1))
+            min_count_safe = ak.min(ak.num(masked_val, axis=1))
+            if max_count_safe == min_count_safe:
+                masked_val = ak.drop_none(masked_val)
+            else:
+                logger.warning(f"drop_none won't probably be safe. Check again the array for {okey}")
+            out[okey] = masked_val
     
     return out, count
             
@@ -71,6 +86,12 @@ def check_nan(var, val):
         val = ak.nan_to_num(val, -999.9)
         n_tot = ak.sum(np.abs(val) >= 0)
         logger.warning(f"{var} --> {n_nan} out of {n_tot} is NaN")
+        
+    n_none = ak.sum(ak.is_none(val, axis=-1))
+    if n_none > 0:
+        logger.warning(f"{var} --> {n_none} out of {n_tot} is None")
+    val = ak.fill_none(val, -999.9)
+        
     return val
     
 
@@ -87,11 +108,11 @@ def wrap(mask, src, dest):
 
 
 
-def unwrap(vardict, counts):
+def unwrap(vardict, counts, debug=False):
     for key, val in vardict.items():
         if val is None:
             continue
-        vardict[key] = back_to_original(val, counts)
+        vardict[key] = back_to_original(val, counts, debug=debug)
 
     return vardict
 
@@ -153,9 +174,9 @@ def to_cartesian(p4):
 #    angle_z = 0.5 * np.pi - rot.phi
 #    angle_x = rot.theta
 #    rot = vec.rotateZ(angle_z).rotateX(angle_x)
-#    #print(rot.x)
-#    #print(rot.y)
-#    #print(rot.z)
+#    print(rot.x)
+#    print(rot.y)
+#    print(rot.z)
 #    return rot
 
 
@@ -209,10 +230,6 @@ def rotate(vec, rot):
         behavior=coffea.nanoevents.methods.vector.behavior,
     )
 
-    print(rot.x)
-    print(rot.y)
-    print(rot.z)
-    
     return rot
 
 
@@ -273,20 +290,21 @@ def getPolarimetricVector(tauP4    = None,
 
     
 
-def get_OMEGA(omega1 : ak.Array,
-              omega2 : ak.Array,
-              **kwargs):
-    return None
-
-def get_OMEGAVIS(omega1 : ak.Array,
+def getCombOMEGA(omega1 : ak.Array,
                  omega2 : ak.Array,
                  **kwargs):
-    return None
+    
+    debug = kwargs.get('debug', False)
 
-def get_OMEGABAR(omega1 : ak.Array,
-                 omega2 : ak.Array,
-                 **kwargs):
-    return None
+    omega = (omega1 + omega2)/(1 + omega1*omega2)
+    nan_omega = np.isnan(omega)
+    inf_omega = ~np.isfinite(omega)
+    bad_omega = (nan_omega | inf_omega)
+    if (debug == True) and ak.any(bad_omega):
+        logger.warning(f'comb : {ak.sum(nan_omega)} NaNs and {ak.sum(inf_omega)} Idfinites')
+    omega = ak.where(bad_omega, -999.0, omega)
+    
+    return omega
 
 
 

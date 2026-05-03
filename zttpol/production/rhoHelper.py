@@ -106,12 +106,11 @@ class rhoHelper:
                                      pionP4   = DPFtauRhoPiRotLV,
                                      pizeroP4 = DPFtauRhoPi0RotLV,
                                      leg      = 'rho')
-        #from IPython import embed; embed(); exit()
-        hunit = hvec.unit
-        #omegabar = hunit.dot(tauLabR1.pvec.unit) # basically cos(theta) type
-
+        #hunit = hvec.unit
+        hunit = hvec/hvec.absolute()
+        
         tauLabR1_pvec = tauLabR1.pvec
-        tauLabR1_pvec_unit = tauLabR1_pvec/tauLabR1_pvec.mag
+        tauLabR1_pvec_unit = tauLabR1_pvec/tauLabR1_pvec.absolute()
         omegabar = hunit.dot(tauLabR1_pvec_unit)
         
         near_boundary = (np.abs(omegabar) > 1) & (np.abs(omegabar) < 1.01)
