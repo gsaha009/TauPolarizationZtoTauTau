@@ -69,3 +69,18 @@
 [submodule "zttpol/data/tools/MuonScaReKIT"]
 	path = zttpol/data/tools/MuonScaReKIT
 	url = https://gitlab.cern.ch/cms-muonPOG/muonscarekit.git
+[submodule "zttpol/data/corrections/TAU/Run2-2018-UL-NanoAODv15"]
+	path = zttpol/data/corrections/TAU/Run2-2018-UL-NanoAODv15
+	url = ssh://git@gitlab.cern.ch:7999/cms-analysis-corrections/TAU/Run2-2018-UL-NanoAODv15.git
+[submodule "zttpol/data/corrections/MUO/Run2-2018-UL-NanoAODv9"]
+	path = zttpol/data/corrections/MUO/Run2-2018-UL-NanoAODv9
+	url = ssh://git@gitlab.cern.ch:7999/cms-analysis-corrections/MUO/Run2-2018-UL-NanoAODv9.git
+[submodule "zttpol/data/corrections/LUM/Run2-2018-UL-NanoAODv9"]
+	path = zttpol/data/corrections/LUM/Run2-2018-UL-NanoAODv9
+	url = ssh://git@gitlab.cern.ch:7999/cms-analysis-corrections/LUM/Run2-2018-UL-NanoAODv9.git
+[submodule "zttpol/data/corrections/EGM/Run2-2018-UL-NanoAODv15"]
+	path = zttpol/data/corrections/EGM/Run2-2018-UL-NanoAODv15
+	url = ssh://git@gitlab.cern.ch:7999/cms-analysis-corrections/EGM/Run2-2018-UL-NanoAODv15.git
+[submodule "zttpol/data/corrections/JME/Run2-2018-UL-NanoAODv15"]
+	path = zttpol/data/corrections/JME/Run2-2018-UL-NanoAODv15
+	url = ssh://git@gitlab.cern.ch:7999/cms-analysis-corrections/JME/Run2-2018-UL-NanoAODv15.git
